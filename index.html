@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HFalak</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231a1714'/><ellipse cx='50' cy='48' rx='22' ry='26' stroke='%237eceba' stroke-width='6' fill='none'/><path d='M50 26 C38 26 28 34 28 48 C28 60 36 68 44 68 C44 68 44 74 38 80' stroke='%237eceba' stroke-width='6' stroke-linecap='round' fill='none'/><circle cx='50' cy='48' r='8' fill='%237eceba'/><path d='M66 32 C72 38 72 58 66 64' stroke='%237eceba' stroke-width='5' stroke-linecap='round' fill='none' opacity='0.6'/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231a1714'/><ellipse cx='50' cy='48' rx='22' ry='26' stroke='%237eceba' stroke-width='6' fill='none'/><path d='M50 26 C38 26 28 34 28 48 C28 60 36 68 44 68 C44 68 44 74 38 80' stroke='%237eceba' stroke-width='6' stroke-linecap='round' fill='none'/><circle cx='50' cy='48' r='8' fill='%237eceba'/></svg>">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HFalak">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a1714">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231a1714'/><text y='.9em' font-size='72' x='12'>🔊</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0ede6;
+    --white: #faf8f4;
+    --ink: #1a1714;
+    --ink2: #4a4540;
+    --muted: #9a948c;
+    --green: #2d6a5a;
+    --green-light: #e8f2ef;
+    --green-mid: #3d8a74;
+    --teal: #7eceba;
+    --amber: #c47b2a;
+    --amber-light: #fdf3e7;
+    --red: #b83232;
+    --red-light: #fceaea;
+    --line: #dedad3;
+    --shadow: 0 2px 12px rgba(26,23,20,0.08);
+    --shadow-md: 0 8px 32px rgba(26,23,20,0.14);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+  /* ══ LOGIN ══ */
+  #screen-login {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  #screen-login::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(126,206,186,0.12) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    pointer-events: none;
+  }
+  #screen-login::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(45,106,90,0.2) 0%, transparent 70%);
+    bottom: -80px; left: -80px;
+    pointer-events: none;
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    position: relative; z-index: 1;
+  }
+  .login-logo .badge {
+    display: inline-block;
+    background: var(--teal);
+    color: var(--ink);
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 4px 12px;
+    border-radius: 7px;
+    margin-bottom: 1rem;
+  }
+  .login-logo h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: var(--white);
+    line-height: 1.3;
+  }
+  .login-logo h1 em { font-style: italic; color: var(--teal); }
+  .login-logo p { color: rgba(255,255,255,0.35); font-size: 0.82rem; margin-top: 10px; }
+
+  .login-cards {
+    display: flex;
+    gap: 1.25rem;
+    position: relative; z-index: 1;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .login-card {
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 2rem 2.5rem;
+    cursor: pointer;
+    text-align: center;
+    width: 230px;
+    transition: all 0.2s;
+  }
+  .login-card:hover {
+    background: rgba(255,255,255,0.11);
+    border-color: var(--teal);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .lc-icon { font-size: 2.6rem; margin-bottom: 1rem; }
+  .login-card h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .login-card p { font-size: 0.74rem; color: rgba(255,255,255,0.38); line-height: 1.6; }
+  .lc-btn {
+    margin-top: 1.25rem;
+    display: inline-block;
+    background: var(--green);
+    color: var(--white);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .login-card:hover .lc-btn { background: var(--green-mid); }
+
+  /* ══ APP SCREENS ══ */
+  .app-screen { display: none; min-height: 100vh; flex-direction: column; }
+  .app-screen.active { display: flex; }
+
+  header {
+    background: var(--ink);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 60px; flex-shrink: 0;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem; font-weight: 500; color: var(--white);
+  }
+  .badge-role {
+    font-size: 0.72rem; font-weight: 700;
+    padding: 3px 9px; border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+  }
+  .badge-orl { background: var(--teal); color: var(--ink); }
+  .badge-aud { background: #e8b94a; color: var(--ink); }
+  .logo em { font-style: italic; color: var(--teal); }
+
+  .header-right { display: flex; align-items: center; gap: 1rem; }
+  .role-pill {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.45);
+    font-size: 0.7rem; font-weight: 500;
+    padding: 4px 12px; border-radius: 20px;
+  }
+  .role-pill strong { color: var(--white); }
+  .btn-logout {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.45);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.73rem;
+    padding: 5px 12px; border-radius: 7px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn-logout:hover { background: rgba(255,255,255,0.13); color: var(--white); }
+
+  /* ══ ORL ══ */
+  .orl-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    flex: 1; overflow: hidden;
+  }
+  .left-panel {
+    background: var(--white);
+    border-right: 1px solid var(--line);
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .left-panel-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.75rem 0.25rem;
+    min-height: 0;
+  }
+  .left-panel-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--white);
+    border-top: 1px solid var(--line);
+    padding: 0.75rem 1.75rem 1rem;
+    box-shadow: 0 -4px 16px rgba(26,23,20,0.07);
+  }
+  .panel-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem; font-weight: 500; color: var(--ink);
+    margin-bottom: 0.85rem;
+  }
+  .panel-title span {
+    display: block;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.71rem; font-weight: 400; color: var(--muted); margin-top: 3px;
+  }
+  .form-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.75rem; }
+  .form-field label {
+    font-size: 0.69rem; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.07em;
+  }
+  .form-field input, .form-field textarea {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.875rem; color: var(--ink);
+    background: var(--bg); border: 1.5px solid var(--line);
+    border-radius: 10px; padding: 9px 13px;
+    outline: none; transition: border-color 0.15s, background 0.15s; width: 100%;
+  }
+  .form-field input:focus, .form-field textarea:focus { border-color: var(--green-mid); background: var(--white); }
+  .form-field textarea { resize: vertical; min-height: 46px; }
+
+  .test-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .test-pill {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 10px;
+    border: 1.5px solid var(--line); border-radius: 7px;
+    font-size: 0.74rem; font-weight: 500;
+    cursor: pointer; color: var(--ink2); background: var(--bg);
+    transition: all 0.13s; user-select: none;
+  }
+  .test-pill input { display: none; }
+  .test-pill:hover { border-color: var(--green-mid); color: var(--green); }
+  .test-pill.selected { background: var(--green-light); border-color: var(--green-mid); color: var(--green); font-weight: 600; }
+
+  .divider { height: 1px; background: var(--line); margin: 1.25rem 0; }
+  .btn-send {
+    width: 100%;
+    background: var(--green);
+    color: var(--white);
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-send:hover { background: var(--green-mid); transform: translateY(-1px); }
+
+  .right-panel { padding: 1.75rem; overflow-y: auto; }
+  .right-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;
+  }
+  .right-title { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 500; }
+  .count-badge {
+    display: inline-block; background: var(--ink); color: var(--white);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.7rem; font-weight: 600;
+    padding: 2px 9px; border-radius: 20px;
+    vertical-align: middle; margin-left: 8px;
+  }
+  .search-box { position: relative; }
+  .search-box svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .search-box input {
+    font-family: 'Instrument Sans', sans-serif; font-size: 0.82rem;
+    padding: 8px 12px 8px 33px;
+    border: 1.5px solid var(--line); border-radius: 9px;
+    background: var(--white); color: var(--ink);
+    outline: none; width: 190px; transition: border-color 0.15s;
+  }
+  .search-box input:focus { border-color: var(--green-mid); }
+
+  .table-wrap { background: var(--white); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--ink); }
+  thead th {
+    padding: 11px 16px; text-align: left;
+    font-size: 0.67rem; font-weight: 600;
+    letter-spacing: 0.09em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--line); transition: background 0.12s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f7f4ee; }
+  tbody td { padding: 13px 16px; font-size: 0.85rem; vertical-align: top; }
+  .td-patient strong { display: block; font-weight: 600; font-size: 0.88rem; }
+  .td-patient time { font-size: 0.7rem; color: var(--muted); display: block; margin-top: 2px; }
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 5px;
+    font-size: 0.69rem; font-weight: 600;
+    background: var(--green-light); color: var(--green);
+    margin: 2px 2px 2px 0; white-space: nowrap;
+  }
+  .comment-cell { font-size: 0.79rem; color: var(--ink2); max-width: 230px; line-height: 1.5; }
+  .comment-cell em { color: var(--muted); font-style: italic; }
+  .status-dot { display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 500; white-space: nowrap; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-new { background: var(--amber); }
+  .dot-done { background: var(--green-mid); }
+  .row-actions { display: flex; gap: 4px; }
+  .btn-row {
+    background: none; border: 1.5px solid var(--line);
+    width: 28px; height: 28px; border-radius: 6px;
+    cursor: pointer; font-size: 0.82rem;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted); transition: all 0.13s;
+  }
+  .btn-row:hover { border-color: var(--green-mid); color: var(--green); background: var(--green-light); }
+  .btn-row.del:hover { border-color: var(--red); color: var(--red); background: var(--red-light); }
+
+  /* ══ AUDIO ══ */
+  .audio-layout { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+  .audio-topbar {
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+    padding: 1rem 2rem;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    flex-shrink: 0;
+  }
+  .audio-topbar-title { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 500; }
+  .filter-tabs { display: flex; gap: 6px; }
+  .ftab {
+    background: none; border: 1.5px solid var(--line);
+    padding: 6px 14px; border-radius: 8px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.77rem; font-weight: 500;
+    cursor: pointer; color: var(--ink2); transition: all 0.13s;
+  }
+  .ftab:hover { border-color: var(--green-mid); color: var(--green); }
+  .ftab.active { background: var(--green); border-color: var(--green); color: var(--white); }
+
+  .audio-cards {
+    padding: 1.75rem 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 1.1rem;
+    align-content: start;
+  }
+  .acard {
+    background: var(--white); border-radius: 14px;
+    box-shadow: var(--shadow); overflow: hidden;
+    border-top: 3px solid var(--line);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .acard:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .acard.new-card { border-top-color: var(--amber); }
+  .acard.done-card { border-top-color: var(--green-mid); opacity: 0.6; }
+  .acard-head {
+    padding: 1.1rem 1.25rem 0.75rem;
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .acard-name { font-weight: 600; font-size: 0.95rem; color: var(--ink); }
+  .acard-date { font-size: 0.7rem; color: var(--muted); margin-top: 3px; }
+  .acard-body { padding: 0 1.25rem 1rem; }
+  .acard-tests { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 0.75rem; }
+  .acard-comment {
+    font-size: 0.79rem; color: var(--ink2);
+    background: var(--bg); padding: 8px 11px;
+    border-radius: 8px; border-left: 3px solid var(--teal);
+    line-height: 1.5; font-style: italic;
+  }
+  .acard-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--line);
+    background: #f7f4ee;
+  }
+  .btn-traite {
+    background: var(--green); color: var(--white);
+    border: none; padding: 6px 14px; border-radius: 7px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.76rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .btn-traite:hover { background: var(--green-mid); }
+  .btn-traite.undo {
+    background: var(--bg); color: var(--muted);
+    border: 1.5px solid var(--line);
+  }
+  .btn-traite.undo:hover { border-color: var(--green-mid); color: var(--green); background: var(--green-light); }
+  .new-dot {
+    width: 9px; height: 9px;
+    background: var(--amber); border-radius: 50%;
+    animation: pulse 1.5s infinite;
+    flex-shrink: 0; margin-top: 4px;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.45; transform:scale(0.75); }
+  }
+
+  .bell-notif {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--amber);
+    color: var(--ink);
+    padding: 12px 24px;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .bell-notif.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    animation: bellShake 0.5s ease;
+  }
+  @keyframes bellShake {
+    0%,100% { rotate: 0deg; }
+    20% { rotate: -10deg; }
+    40% { rotate: 10deg; }
+    60% { rotate: -8deg; }
+    80% { rotate: 8deg; }
+  }
+  .empty { text-align: center; padding: 3.5rem 2rem; color: var(--muted); }
+  .empty .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+  .empty p { font-size: 0.82rem; }
+  .toast {
+    position: fixed; bottom: 1.75rem; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: var(--white);
+    padding: 11px 20px; border-radius: 40px;
+    font-size: 0.8rem; font-weight: 500; white-space: nowrap;
+    box-shadow: var(--shadow-md);
+    opacity: 0; pointer-events: none;
+    transition: all 0.28s; z-index: 999;
+    border-left: 3px solid var(--teal);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 780px) {
+    .orl-layout { grid-template-columns: 1fr; }
+    .left-panel { border-right: none; border-bottom: 1px solid var(--line); }
+    .right-panel, .audio-cards { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ ÉCRAN DE CONNEXION ══ -->
+<div id="screen-login">
+  <div class="login-logo">
+    <div class="badge">ORL</div>
+    <h1>Centre ORL<br><em>Dr. Baghdadi Khalid</em></h1>
+    <p>Sélectionnez votre profil pour continuer</p>
+  </div>
+
+  <!-- MOT DE PASSE -->
+  <div id="password-screen" style="position:relative;z-index:1;margin-bottom:1.5rem;text-align:center;">
+    <div style="background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);border-radius:16px;padding:1.5rem 2rem;width:280px;margin:0 auto;">
+      <div style="font-size:1.5rem;margin-bottom:0.75rem;">🔒</div>
+      <div style="font-family:'Fraunces',serif;font-size:1rem;color:white;margin-bottom:1rem;">Mot de passe requis</div>
+      <input type="password" id="pwd-input" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter')checkPassword()"
+        style="
+          width:100%;font-family:'Instrument Sans',sans-serif;
+          font-size:0.9rem;padding:10px 14px;
+          border:1.5px solid rgba(255,255,255,0.2);
+          border-radius:9px;background:rgba(255,255,255,0.1);
+          color:white;outline:none;text-align:center;
+          margin-bottom:0.75rem;
+        "/>
+      <div id="pwd-error" style="color:#ff6b6b;font-size:0.75rem;margin-bottom:0.75rem;display:none;">❌ Mot de passe incorrect</div>
+      <button onclick="checkPassword()" style="
+        width:100%;background:var(--green);color:white;border:none;
+        padding:10px;border-radius:9px;
+        font-family:'Instrument Sans',sans-serif;
+        font-size:0.85rem;font-weight:600;cursor:pointer;
+      ">Accéder</button>
+    </div>
+  </div>
+
+  <div id="role-screen" style="display:none;">
+    <div class="login-cards">
+    <div class="login-card">
+      <div class="lc-icon">🩺</div>
+      <h2>ORL</h2>
+      <p style="margin-bottom:8px;">Entrez votre nom :</p>
+      <input type="text" id="orl-name-input" 
+        value="Dr. Baghdadi Khalid"
+        style="
+          width:100%;
+          font-family:'Instrument Sans',sans-serif;
+          font-size:0.88rem;padding:10px 12px;
+          border:2px solid #7eceba;
+          border-radius:8px;
+          background:rgba(255,255,255,0.15);
+          color:white;outline:none;text-align:center;
+          cursor:text;
+        " />
+      <p style="margin-top:6px;font-size:0.7rem;opacity:0.5;">Modifiez le nom puis cliquez connexion</p>
+      <div class="lc-btn" onclick="login('orl')" style="cursor:pointer;margin-top:10px;display:block;">Connexion ORL</div>
+    </div>
+    <div class="login-card" onclick="login('audio')">
+      <div class="lc-icon">🎧</div>
+      <h2>Audiologue</h2>
+      <p>Réception et traitement<br>des demandes de tests</p>
+      <div class="lc-btn">Connexion Audio</div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ══ VUE ORL ══ -->
+<div id="screen-orl" class="app-screen">
+  <header>
+    <div class="logo">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:white;letter-spacing:-0.01em;">H<em style="font-style:italic;color:#7eceba;">Falak</em></span>
+        <span style="background:linear-gradient(135deg,#2d6a5a,#7eceba);color:white;font-size:0.8rem;font-weight:700;padding:4px 12px;border-radius:8px;letter-spacing:0.08em;font-family:'Instrument Sans',sans-serif;">ORL</span>
+      </div>
+    </div>
+    <!-- Vague séparatrice -->
+    <div style="flex:1;margin:0 1.5rem;">
+      <svg viewBox="0 0 200 20" preserveAspectRatio="none" style="width:100%;height:20px;opacity:0.2;">
+        <path d="M0,10 C20,0 40,20 60,10 C80,0 100,20 120,10 C140,0 160,20 180,10 C190,5 195,7 200,10" stroke="#7eceba" stroke-width="2" fill="none"/>
+      </svg>
+    </div>
+    <div class="header-right">
+      <div class="role-pill" style="display:flex;align-items:center;gap:6px;">
+        Connecté :
+        <input id="orl-name-display"
+          value="Dr. Baghdadi Khalid"
+          oninput="syncOrlName()"
+          style="
+            font-family:'Instrument Sans',sans-serif;
+            font-size:0.82rem;font-weight:600;
+            background:rgba(255,255,255,0.1);
+            border:1px solid rgba(255,255,255,0.2);
+            border-radius:6px;padding:3px 8px;
+            color:white;outline:none;width:170px;
+            transition:border-color 0.15s;
+          "
+          onfocus="this.style.borderColor='var(--teal)'"
+          onblur="this.style.borderColor='rgba(255,255,255,0.2)'"
+        />
+      </div>
+      <button class="btn-logout" onclick="logout()">← Déconnexion</button>
+    </div>
+  </header>
+
+  <div class="orl-layout">
+    <aside class="left-panel">
+      <div class="left-panel-scroll">
+      <div class="panel-title">
+        Nouvelle demande
+        <span>Envoi à l'audiologue</span>
+      </div>
+
+      <div class="form-field">
+        <label>Nom du patient *</label>
+        <input type="text" id="f-nom" placeholder="ex : AMRANI Fatima">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0.75rem;">
+        <div>
+          <div style="font-size:0.69rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;">Sexe</div>
+          <div style="display:flex;gap:6px;">
+            <label id="sex-m" onclick="setSex('M')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 6px;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:500;color:var(--ink2);background:var(--bg);transition:all 0.13s;user-select:none;">
+              <input type="radio" name="f-sex" value="M" style="display:none;"> ♂ Masc.
+            </label>
+            <label id="sex-f" onclick="setSex('F')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 6px;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:500;color:var(--ink2);background:var(--bg);transition:all 0.13s;user-select:none;">
+              <input type="radio" name="f-sex" value="F" style="display:none;"> ♀ Fém.
+            </label>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.69rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;">Âge</div>
+          <div style="display:flex;gap:6px;">
+            <label id="age-a" onclick="setAge('A')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 6px;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:500;color:var(--ink2);background:var(--bg);transition:all 0.13s;user-select:none;">
+              <input type="radio" name="f-age" value="A" style="display:none;"> 🧑 Adulte
+            </label>
+            <label id="age-e" onclick="setAge('E')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 6px;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:500;color:var(--ink2);background:var(--bg);transition:all 0.13s;user-select:none;">
+              <input type="radio" name="f-age" value="E" style="display:none;"> 🧒 Enfant
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label>Tests demandés *</label>
+          <button id="btn-edit-tests" onclick="toggleEditTests()" style="
+            background:none;border:1.5px solid var(--line);
+            border-radius:7px;padding:3px 10px;
+            font-family:'Instrument Sans',sans-serif;font-size:0.72rem;
+            font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.15s;
+          ">✏️ Modifier</button>
+        </div>
+        <div class="test-pills" id="test-pills" style="max-height:200px;overflow-y:auto;padding-right:4px;">
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="Tympanométrie">📊 Tympanométrie</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="Audiométrie tonale">🎵 Audio. tonale</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="Audiométrie vocale">🗣️ Audio. vocale</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="Contrôle d'appareillage">🎧 Contrôle appareillage</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="TAC">🧪 TAC</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="Rhinomanométrie sans DC">👃 Rhino. sans DC</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="Rhinomanométrie avec DC">💊 Rhino. avec DC</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="VHIT">🔄 VHIT</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="OEA">🔬 OEA</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="PEA seuils">⚡ PEA seuils</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="PEA rapide">⚡ PEA rapide</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="VEMPc">🧠 VEMPc</label>
+          <label class="test-pill" onclick="togglePill(this)"><input type="checkbox" value="VNG">👁️ VNG</label>
+        </div>
+        <!-- Bouton ajouter un test -->
+        <button onclick="openAddTest()" style="
+          margin-top:8px;
+          background:none;
+          border:1.5px dashed var(--line);
+          border-radius:7px;
+          padding:5px 12px;
+          font-family:'Instrument Sans',sans-serif;
+          font-size:0.75rem;
+          font-weight:600;
+          color:var(--muted);
+          cursor:pointer;
+          transition:all 0.15s;
+          display:flex;align-items:center;gap:5px;
+        " onmouseover="this.style.borderColor='var(--green-mid)';this.style.color='var(--green)'"
+           onmouseout="this.style.borderColor='var(--line)';this.style.color='var(--muted)'">
+          + Ajouter un test
+        </button>
+      </div>
+
+      <!-- Mini modale ajout test -->
+      <div id="add-test-modal" style="display:none;position:fixed;inset:0;background:rgba(26,23,20,0.5);z-index:300;align-items:center;justify-content:center;">
+        <div style="background:var(--white);border-radius:16px;padding:1.5rem;width:90%;max-width:340px;box-shadow:0 12px 40px rgba(0,0,0,0.2);">
+          <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:500;margin-bottom:1rem;color:var(--ink);">Nouveau test</div>
+          <input type="text" id="new-test-input" placeholder="Nom du test..." style="
+            font-family:'Instrument Sans',sans-serif;
+            font-size:0.9rem;color:var(--ink);
+            background:var(--bg);border:1.5px solid var(--line);
+            border-radius:10px;padding:10px 13px;
+            outline:none;width:100%;margin-bottom:1rem;
+          " onkeydown="if(event.key==='Enter')confirmAddTest()">
+          <div style="display:flex;gap:8px;">
+            <button onclick="closeAddTest()" style="
+              flex:1;background:var(--bg);border:1.5px solid var(--line);
+              border-radius:9px;padding:9px;
+              font-family:'Instrument Sans',sans-serif;font-size:0.85rem;
+              font-weight:500;cursor:pointer;color:var(--ink2);
+            ">Annuler</button>
+            <button onclick="confirmAddTest()" style="
+              flex:1;background:var(--green);border:none;
+              border-radius:9px;padding:9px;
+              font-family:'Instrument Sans',sans-serif;font-size:0.85rem;
+              font-weight:600;cursor:pointer;color:white;
+            ">Ajouter</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field" style="padding-top:0.25rem;">
+        <button class="btn-send" onclick="sendDemande()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          Envoyer la demande
+        </button>
+      </div>
+
+      <div class="form-field">
+        <label>Commentaires / Notes</label>
+        <textarea id="f-comment" placeholder="Antécédents, symptômes, remarques cliniques..."></textarea>
+      </div>
+
+      </div> <!-- end left-panel-scroll -->
+    </aside>
+
+    <section class="right-panel">
+      <div class="right-header">
+        <div class="right-title">
+          Demandes envoyées
+          <span class="count-badge" id="orl-count">0</span>
+        </div>
+        <div class="search-box">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Rechercher…" oninput="renderORL()" id="orl-search">
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Tests</th>
+              <th>Commentaires ORL / Audio</th>
+              <th>Statut</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="orl-tbody"></tbody>
+        </table>
+        <div id="orl-empty" class="empty" style="display:none;">
+          <div class="empty-icon">📭</div>
+          <p>Aucune demande pour le moment</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ══ VUE AUDIOPROTHÉSISTE ══ -->
+<div id="screen-audio" class="app-screen">
+  <header>
+    <div class="logo">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:white;letter-spacing:-0.01em;">H<em style="font-style:italic;color:#e8b94a;">Falak</em></span>
+        <span style="background:linear-gradient(135deg,#c47b2a,#e8b94a);color:white;font-size:0.8rem;font-weight:700;padding:4px 12px;border-radius:8px;letter-spacing:0.08em;font-family:'Instrument Sans',sans-serif;">AUDIO</span>
+      </div>
+    </div>
+    <!-- Vague séparatrice -->
+    <div style="flex:1;margin:0 1.5rem;">
+      <svg viewBox="0 0 200 20" preserveAspectRatio="none" style="width:100%;height:20px;opacity:0.2;">
+        <path d="M0,10 C20,0 40,20 60,10 C80,0 100,20 120,10 C140,0 160,20 180,10 C190,5 195,7 200,10" stroke="#e8b94a" stroke-width="2" fill="none"/>
+      </svg>
+    </div>
+    <div class="header-right">
+      <div class="role-pill">Connecté : <strong>Audiologue</strong></div>
+      <button class="btn-logout" onclick="logout()">← Déconnexion</button>
+    </div>
+  </header>
+
+  <div class="audio-layout">
+    <div class="audio-topbar">
+      <div class="audio-topbar-title">
+        Demandes reçues
+        <span class="count-badge" id="audio-count">0</span>
+      </div>
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="setFilter('all',this)">Toutes</button>
+        <button class="ftab" onclick="setFilter('new',this)">⏳ En attente</button>
+        <button class="ftab" onclick="setFilter('done',this)">✅ Traitées</button>
+      </div>
+    </div>
+
+    <div class="audio-cards" id="audio-cards"></div>
+    <div id="audio-empty" class="empty" style="display:none;">
+      <div class="empty-icon">📭</div>
+      <p>Aucune demande à afficher</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODALE TRAITÉ ══ -->
+<div id="traite-modal" style="display:none;position:fixed;inset:0;background:rgba(26,23,20,0.55);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--white);border-radius:18px;padding:1.75rem;width:90%;max-width:380px;box-shadow:0 16px 48px rgba(0,0,0,0.25);">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;">
+      <span style="font-size:1.4rem;">✅</span>
+      <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:500;color:var(--ink);">Marquer comme traité</div>
+    </div>
+    <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem;">Commentaire de l'audiologue <em style="font-size:0.72rem;">(optionnel)</em></div>
+    <textarea id="traite-comment" placeholder="Ex : Résultats normaux, audiogramme effectué, RAS…" style="
+      font-family:'Instrument Sans',sans-serif;
+      font-size:0.875rem;color:var(--ink);
+      background:var(--bg);border:1.5px solid var(--line);
+      border-radius:10px;padding:10px 13px;
+      outline:none;width:100%;min-height:90px;resize:vertical;
+      margin-bottom:1.1rem;
+      transition:border-color 0.15s;
+    " onfocus="this.style.borderColor='var(--green-mid)'" onblur="this.style.borderColor='var(--line)'"></textarea>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeTraiteModal()" style="
+        flex:1;background:var(--bg);border:1.5px solid var(--line);
+        border-radius:9px;padding:10px;
+        font-family:'Instrument Sans',sans-serif;font-size:0.85rem;
+        font-weight:500;cursor:pointer;color:var(--ink2);transition:all 0.13s;
+      " onmouseover="this.style.borderColor='var(--muted)'" onmouseout="this.style.borderColor='var(--line)'">Annuler</button>
+      <button onclick="confirmTraite()" style="
+        flex:2;background:var(--green);border:none;
+        border-radius:9px;padding:10px;
+        font-family:'Instrument Sans',sans-serif;font-size:0.875rem;
+        font-weight:600;cursor:pointer;color:white;transition:background 0.15s;
+        display:flex;align-items:center;justify-content:center;gap:6px;
+      " onmouseover="this.style.background='var(--green-mid)'" onmouseout="this.style.background='var(--green)'">
+        ✅ Confirmer traité
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="bell-notif" id="bell-notif">🔔 Nouveau patient !</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── SUPABASE CONFIG ──
+  const SUPA_URL = 'https://ydpoiohwftaypwtqukxl.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkcG9pb2h3ZnRheXB3dHF1a3hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDcyNzUsImV4cCI6MjA4OTA4MzI3NX0.G-0MJ1TkF07d45lcWwwc95eIOCTosbRsZhyaPzwWTfM';
+
+  const api = (path, opts={}) => fetch(`${SUPA_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': `Bearer ${SUPA_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    }, ...opts
+  });
+
+  let data = [];
+  let audioFilter = 'all';
+  let currentRole = null;
+  let pollTimer = null;
+
+  function todayStr() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  async function loadData() {
+    try {
+      const now = new Date();
+      const r = await api(`demandes?order=created_at.desc`);
+      const rows = await r.json();
+
+      // Calculer le dernier 8h du matin
+      const last8h = new Date();
+      last8h.setHours(8, 0, 0, 0);
+      if (now < last8h) last8h.setDate(last8h.getDate() - 1);
+
+      // Garder seulement les patients après le dernier 8h
+      data = rows.filter(d => d.date && new Date(d.date) >= last8h);
+
+      // Supprimer les anciens automatiquement
+      const old = rows.filter(d => !d.date || new Date(d.date) < last8h);
+      for (const o of old) {
+        await api(`demandes?id=eq.${o.id}`, { method: 'DELETE' });
+      }
+    } catch(e) { data = []; }
+  }
+
+  async function saveRow(row) {
+    const res = await api('demandes', {
+      method: 'POST',
+      body: JSON.stringify({
+        nom: row.nom,
+        tests: JSON.stringify(row.tests),
+        comment: row.comment,
+        done: row.done,
+        date: new Date().toISOString(),
+        orl_name: row.orl_name,
+        sex: row.sex || null,
+        age: row.age || null
+      })
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      console.error('Supabase error:', body);
+      throw new Error(body.message || body.error || 'Erreur Supabase');
+    }
+    return body;
+  }
+
+  async function updateRow(id, done, audioComment) {
+    const body = { done };
+    if (audioComment !== undefined) body.audio_comment = audioComment;
+    const res = await api(`demandes?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      console.error('updateRow error:', err);
+      throw new Error(err.message || 'Erreur mise à jour');
+    }
+  }
+
+  let traiteTargetId = null;
+
+  function openTraiteModal(id) {
+    traiteTargetId = id;
+    document.getElementById('traite-comment').value = '';
+    document.getElementById('traite-modal').style.display = 'flex';
+    setTimeout(() => document.getElementById('traite-comment').focus(), 100);
+  }
+
+  function closeTraiteModal() {
+    document.getElementById('traite-modal').style.display = 'none';
+    traiteTargetId = null;
+  }
+
+  async function confirmTraite() {
+    if (!traiteTargetId) return;
+    const audioComment = document.getElementById('traite-comment').value.trim();
+    const r = data.find(d => d.id === traiteTargetId);
+    if (r) {
+      r.done = true;
+      r.audio_comment = audioComment;
+      await updateRow(traiteTargetId, true, audioComment);
+      closeTraiteModal();
+      await loadData();
+      renderAudio(); renderORL();
+      toast('✅ Marqué comme traité');
+    }
+  }
+
+  async function deleteRowDB(id) {
+    await api(`demandes?id=eq.${id}`, { method: 'DELETE' });
+  }
+
+  document.addEventListener('click', unlockAudio, { once: false });
+  document.addEventListener('touchstart', unlockAudio, { once: false });
+
+  function startPolling() {
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(async () => {
+      const prevCount = data.filter(d => !d.done).length;
+      await loadData();
+      const newCount = data.filter(d => !d.done).length;
+      if (newCount > prevCount && currentRole === 'audio') {
+        playBell();
+        showBellNotif(newCount - prevCount);
+      }
+      renderORL(); renderAudio();
+    }, 4000);
+  }
+
+  let audioCtx = null;
+
+  function getAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  function unlockAudio() {
+    // Déverrouille l'audio au premier clic/toucher
+    const ctx = getAudioCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+  }
+
+  function playBell() {
+    try {
+      const ctx = getAudioCtx();
+      if (ctx.state === 'suspended') { ctx.resume(); }
+
+      // Première note
+      const o1 = ctx.createOscillator();
+      const g1 = ctx.createGain();
+      o1.connect(g1); g1.connect(ctx.destination);
+      o1.frequency.setValueAtTime(1050, ctx.currentTime);
+      o1.frequency.exponentialRampToValueAtTime(700, ctx.currentTime + 0.25);
+      g1.gain.setValueAtTime(0.6, ctx.currentTime);
+      g1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      o1.start(ctx.currentTime);
+      o1.stop(ctx.currentTime + 0.5);
+
+      // Deuxième note
+      const o2 = ctx.createOscillator();
+      const g2 = ctx.createGain();
+      o2.connect(g2); g2.connect(ctx.destination);
+      o2.frequency.setValueAtTime(880, ctx.currentTime + 0.3);
+      o2.frequency.exponentialRampToValueAtTime(550, ctx.currentTime + 0.7);
+      g2.gain.setValueAtTime(0, ctx.currentTime + 0.3);
+      g2.gain.setValueAtTime(0.5, ctx.currentTime + 0.31);
+      g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.9);
+      o2.start(ctx.currentTime + 0.3);
+      o2.stop(ctx.currentTime + 0.9);
+
+    } catch(e) { console.warn('Bell error:', e); }
+  }
+
+  function showBellNotif(count) {
+    const notif = document.getElementById('bell-notif');
+    notif.textContent = `🔔 ${count} nouveau${count > 1 ? 'x' : ''} patient${count > 1 ? 's' : ''} !`;
+    notif.classList.add('show');
+    setTimeout(() => notif.classList.remove('show'), 4000);
+  }
+
+  // ── LOGIN / LOGOUT ──
+  function checkPassword() {
+    const pwd = document.getElementById('pwd-input').value;
+    if (pwd === 'Zayd.2021') {
+      document.getElementById('password-screen').style.display = 'none';
+      document.getElementById('role-screen').style.display = 'block';
+      document.getElementById('pwd-error').style.display = 'none';
+    } else {
+      document.getElementById('pwd-error').style.display = 'block';
+      document.getElementById('pwd-input').value = '';
+      document.getElementById('pwd-input').focus();
+    }
+  }
+
+  async function login(role) {
+    unlockAudio();
+    currentRole = role;
+    if (role === 'orl') {
+      const nom = document.getElementById('orl-name-input').value.trim() || 'Dr. Baghdadi Khalid';
+      document.getElementById('orl-name-display').value = nom;
+    }
+    document.getElementById('screen-login').style.display = 'none';
+    toast('⏳ Chargement...');
+    await loadData();
+    const id = role === 'orl' ? 'screen-orl' : 'screen-audio';
+    document.getElementById(id).classList.add('active');
+    role === 'orl' ? renderORL() : renderAudio();
+    startPolling();
+  }
+
+  function logout() {
+    if (pollTimer) clearInterval(pollTimer);
+    currentRole = null;
+    document.getElementById('screen-login').style.display = 'flex';
+    document.getElementById('screen-orl').classList.remove('active');
+    document.getElementById('screen-audio').classList.remove('active');
+  }
+
+  function syncOrlName() {
+    // Le nom est lu directement depuis l'input au moment de l'envoi — rien à faire ici
+    // mais on peut forcer un re-render si besoin
+  }
+
+  let selectedSex = null;
+  let selectedAge = null;
+
+  function setSex(val) {
+    selectedSex = val;
+    const mEl = document.getElementById('sex-m');
+    const fEl = document.getElementById('sex-f');
+    if (!mEl || !fEl) return;
+    mEl.style.background = val==='M' ? 'var(--green-light)' : 'var(--bg)';
+    mEl.style.borderColor = val==='M' ? 'var(--green-mid)' : 'var(--line)';
+    mEl.style.color = val==='M' ? 'var(--green)' : 'var(--ink2)';
+    fEl.style.background = val==='F' ? '#fce8f0' : 'var(--bg)';
+    fEl.style.borderColor = val==='F' ? '#d0608a' : 'var(--line)';
+    fEl.style.color = val==='F' ? '#b8456e' : 'var(--ink2)';
+  }
+
+  function setAge(val) {
+    selectedAge = val;
+    const aEl = document.getElementById('age-a');
+    const eEl = document.getElementById('age-e');
+    if (!aEl || !eEl) return;
+    aEl.style.background = val==='A' ? 'var(--green-light)' : 'var(--bg)';
+    aEl.style.borderColor = val==='A' ? 'var(--green-mid)' : 'var(--line)';
+    aEl.style.color = val==='A' ? 'var(--green)' : 'var(--ink2)';
+    eEl.style.background = val==='E' ? 'var(--amber-light)' : 'var(--bg)';
+    eEl.style.borderColor = val==='E' ? 'var(--amber)' : 'var(--line)';
+    eEl.style.color = val==='E' ? 'var(--amber)' : 'var(--ink2)';
+  }
+
+  let editTestsMode = false;
+
+  function toggleEditTests() {
+    editTestsMode = !editTestsMode;
+    const btn = document.getElementById('btn-edit-tests');
+    const pills = document.querySelectorAll('#test-pills .test-pill');
+    if (editTestsMode) {
+      btn.textContent = '✅ Terminer';
+      btn.style.borderColor = 'var(--green-mid)';
+      btn.style.color = 'var(--green)';
+      pills.forEach(pill => {
+        if (!pill.querySelector('.del-test')) {
+          const x = document.createElement('span');
+          x.className = 'del-test';
+          x.textContent = '✕';
+          x.style.cssText = 'margin-left:5px;color:var(--red);font-size:0.75rem;font-weight:700;cursor:pointer;';
+          x.onclick = function(e) { e.stopPropagation(); e.preventDefault(); pill.remove(); };
+          pill.appendChild(x);
+        }
+      });
+    } else {
+      btn.textContent = '✏️ Modifier';
+      btn.style.borderColor = 'var(--line)';
+      btn.style.color = 'var(--muted)';
+      document.querySelectorAll('.del-test').forEach(x => x.remove());
+    }
+  }
+
+  function openAddTest() {
+    const modal = document.getElementById('add-test-modal');
+    modal.style.display = 'flex';
+    setTimeout(() => document.getElementById('new-test-input').focus(), 100);
+  }
+
+  function closeAddTest() {
+    document.getElementById('add-test-modal').style.display = 'none';
+    document.getElementById('new-test-input').value = '';
+  }
+
+  function confirmAddTest() {
+    const val = document.getElementById('new-test-input').value.trim();
+    if (!val) { document.getElementById('new-test-input').focus(); return; }
+    const pills = document.getElementById('test-pills');
+    const label = document.createElement('label');
+    label.className = 'test-pill selected';
+    label.onclick = function() { togglePill(this); };
+    label.innerHTML = `<input type="checkbox" value="${val}" checked>🔹 ${val}`;
+    pills.appendChild(label);
+    closeAddTest();
+    toast('✅ Test "' + val + '" ajouté');
+  }
+
+  function togglePill(label) {
+    setTimeout(() => label.classList.toggle('selected', label.querySelector('input').checked), 0);
+  }
+
+  async function sendDemande() {
+    const nom = document.getElementById('f-nom').value.trim();
+    const tests = [...document.querySelectorAll('#test-pills input:checked')].map(c => c.value);
+    const comment = document.getElementById('f-comment').value.trim();
+    if (!nom)          { toast('⚠️ Veuillez saisir le nom du patient'); return; }
+    if (!tests.length) { toast('⚠️ Sélectionnez au moins un test'); return; }
+
+    const orlName = document.getElementById('orl-name-display').value.trim() || 'Dr. Baghdadi Khalid';
+
+    toast('⏳ Envoi en cours...');
+    try {
+      const result = await saveRow({ nom: nom.toUpperCase(), tests, comment, done: false, orl_name: orlName, sex: selectedSex, age: selectedAge });
+      if (!result) { toast('❌ Erreur lors de l\'envoi — vérifiez la console'); return; }
+    } catch(e) {
+      toast('❌ Erreur : ' + e.message);
+      console.error('saveRow error:', e);
+      return;
+    }
+
+    document.getElementById('f-nom').value = '';
+    document.getElementById('f-comment').value = '';
+    document.querySelectorAll('#test-pills input').forEach(c => c.checked = false);
+    document.querySelectorAll('#test-pills label').forEach(l => l.classList.remove('selected'));
+    selectedSex = null; selectedAge = null;
+    setSex(null); setAge(null);
+
+    await loadData();
+    renderORL(); renderAudio();
+    toast('✅ Demande envoyée à l\'audiologue');
+  }
+
+  async function toggleDone(id) {
+    const r = data.find(d => d.id === id);
+    if (r) {
+      r.done = !r.done;
+      await updateRow(id, r.done);
+      await loadData();
+      renderORL(); renderAudio();
+    }
+  }
+
+  async function toggleDoneAudio(id) {
+    const r = data.find(d => d.id === id);
+    if (r) {
+      r.done = !r.done;
+      await updateRow(id, r.done);
+      await loadData();
+      renderAudio(); renderORL();
+      toast(r.done ? '✅ Marqué comme traité' : '↩ Remis en attente');
+    }
+  }
+
+  async function deleteRow(id) {
+    await deleteRowDB(id);
+    await loadData();
+    renderORL(); renderAudio();
+    toast('🗑 Demande supprimée');
+  }
+
+  function setFilter(f, btn) {
+    audioFilter = f;
+    document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderAudio();
+  }
+
+  function renderORL() {
+    const q = (document.getElementById('orl-search')?.value||'').toLowerCase();
+    const filtered = data.filter(d => {
+      const nom = (d.nom||'').toLowerCase();
+      const tests = d.tests ? (typeof d.tests === 'string' ? d.tests : d.tests.join(' ')).toLowerCase() : '';
+      return nom.includes(q) || tests.includes(q);
+    });
+    document.getElementById('orl-count').textContent = data.filter(d=>!d.done).length;
+    const tbody = document.getElementById('orl-tbody');
+    const empty = document.getElementById('orl-empty');
+    if (!filtered.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+    empty.style.display = 'none';
+    tbody.innerHTML = filtered.map(d => {
+      const tests = typeof d.tests === 'string' ? JSON.parse(d.tests) : d.tests;
+      const dateAff = d.date ? new Date(d.date).toLocaleDateString('fr-FR') + ' ' + new Date(d.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '';
+      const sexBadge = d.sex === 'M' ? '<span style="font-size:0.68rem;font-weight:600;color:var(--green);background:var(--green-light);padding:1px 6px;border-radius:4px;margin-right:4px;">♂ M</span>'
+                     : d.sex === 'F' ? '<span style="font-size:0.68rem;font-weight:600;color:#b8456e;background:#fce8f0;padding:1px 6px;border-radius:4px;margin-right:4px;">♀ F</span>' : '';
+      const ageBadge = d.age === 'A' ? '<span style="font-size:0.68rem;font-weight:600;color:var(--ink2);background:var(--bg);padding:1px 6px;border-radius:4px;border:1px solid var(--line);">Adulte</span>'
+                     : d.age === 'E' ? '<span style="font-size:0.68rem;font-weight:600;color:var(--amber);background:var(--amber-light);padding:1px 6px;border-radius:4px;">Enfant</span>' : '';
+      return `<tr style="${d.done?'opacity:0.5;':''}">
+        <td class="td-patient"><strong>${d.nom}</strong><div style="margin-top:3px;">${sexBadge}${ageBadge}</div><time>${dateAff}</time></td>
+        <td>${tests.map(t=>`<span class="tag">${t}</span>`).join('')}</td>
+        <td class="comment-cell">
+          ${d.comment ? `<div>${d.comment}</div>` : '<em>Aucun</em>'}
+          ${d.audio_comment ? `<div style="margin-top:4px;padding:4px 8px;background:#fdf3e7;border-left:3px solid var(--amber);border-radius:4px;font-size:0.75rem;color:var(--amber);"><strong>💬 Audio :</strong> ${d.audio_comment}</div>` : ''}
+        </td>
+        <td><div class="status-dot"><span class="dot ${d.done?'dot-done':'dot-new'}"></span>${d.done?'Traité':'En attente'}</div></td>
+        <td></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderAudio() {
+    let filtered = [...data];
+    if (audioFilter==='new')  filtered = filtered.filter(d=>!d.done);
+    if (audioFilter==='done') filtered = filtered.filter(d=>d.done);
+    document.getElementById('audio-count').textContent = data.filter(d=>!d.done).length;
+    const container = document.getElementById('audio-cards');
+    const empty = document.getElementById('audio-empty');
+    if (!filtered.length) { container.innerHTML=''; empty.style.display='block'; return; }
+    empty.style.display = 'none';
+    container.innerHTML = filtered.map(d => {
+      const tests = typeof d.tests === 'string' ? JSON.parse(d.tests) : d.tests;
+      const dateAff = d.date ? new Date(d.date).toLocaleDateString('fr-FR') + ' ' + new Date(d.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '';
+      const sexBadge = d.sex === 'M' ? '<span style="font-size:0.68rem;font-weight:600;color:var(--green);background:var(--green-light);padding:1px 6px;border-radius:4px;">♂ Masc.</span>'
+                     : d.sex === 'F' ? '<span style="font-size:0.68rem;font-weight:600;color:#b8456e;background:#fce8f0;padding:1px 6px;border-radius:4px;">♀ Fém.</span>' : '';
+      const ageBadge = d.age === 'A' ? '<span style="font-size:0.68rem;font-weight:600;color:var(--ink2);background:var(--bg);padding:1px 6px;border-radius:4px;border:1px solid var(--line);">Adulte</span>'
+                     : d.age === 'E' ? '<span style="font-size:0.68rem;font-weight:600;color:var(--amber);background:var(--amber-light);padding:1px 6px;border-radius:4px;">Enfant</span>' : '';
+      return `<div class="acard ${d.done?'done-card':'new-card'}">
+        <div class="acard-head">
+          <div>
+            <div class="acard-name">${d.nom}</div>
+            <div style="display:flex;gap:4px;margin-top:4px;">${sexBadge}${ageBadge}</div>
+            <div class="acard-date">📅 ${dateAff}</div>
+          </div>
+          ${!d.done ? '<div class="new-dot"></div>' : '<span style="font-size:1.1rem">✅</span>'}
+        </div>
+        <div class="acard-body">
+          <div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px;">
+            👨‍⚕️ <strong style="color:var(--ink2);">${d.orl_name || 'Dr. Baghdadi Khalid'}</strong>
+          </div>
+          <div class="acard-tests">${tests.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+          ${d.comment?`<div class="acard-comment">${d.comment}</div>`:''}
+          ${d.audio_comment?`<div class="acard-comment" style="border-left-color:var(--amber);margin-top:6px;">💬 <em>${d.audio_comment}</em></div>`:''}
+        </div>
+        <div class="acard-footer">
+          <div class="status-dot">
+            <span class="dot ${d.done?'dot-done':'dot-new'}"></span>
+            ${d.done?'Traité':'En attente'}
+          </div>
+          ${!d.done
+            ? `<button class="btn-traite" onclick="openTraiteModal(${d.id})">✓ Marquer traité</button>`
+            : `<button class="btn-traite undo" onclick="toggleDoneAudio(${d.id})">↩ Rouvrir</button>`
+          }
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'), 2800);
+  }
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log('✅ HFalak PWA prête'))
+        .catch(e => console.warn('SW error:', e));
+    });
+  }
+</script>
+</body>
+</html>
