@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HFalak</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231a1714'/><ellipse cx='50' cy='48' rx='22' ry='26' stroke='%237eceba' stroke-width='6' fill='none'/><path d='M50 26 C38 26 28 34 28 48 C28 60 36 68 44 68 C44 68 44 74 38 80' stroke='%237eceba' stroke-width='6' stroke-linecap='round' fill='none'/><circle cx='50' cy='48' r='8' fill='%237eceba'/><path d='M66 32 C72 38 72 58 66 64' stroke='%237eceba' stroke-width='5' stroke-linecap='round' fill='none' opacity='0.6'/></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231a1714'/><ellipse cx='50' cy='48' rx='22' ry='26' stroke='%237eceba' stroke-width='6' fill='none'/><path d='M50 26 C38 26 28 34 28 48 C28 60 36 68 44 68 C44 68 44 74 38 80' stroke='%237eceba' stroke-width='6' stroke-linecap='round' fill='none'/><circle cx='50' cy='48' r='8' fill='%237eceba'/></svg>">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="HFalak">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1a1714">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231a1714'/><text y='.9em' font-size='72' x='12'>🔊</text></svg>">
+
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1272,6 +1272,37 @@
     el.classList.add('show');
     setTimeout(()=>el.classList.remove('show'), 2800);
   }
+
+  // ══ SUPPRESSION AUTOMATIQUE À 8H00 ══
+  async function autoDeleteAtEight() {
+    const now = new Date();
+    const h = now.getHours();
+    const m = now.getMinutes();
+
+    // Vérifie si on est entre 8h00 et 8h01
+    if (h === 8 && m === 0) {
+      const lastRun = localStorage.getItem('hfalak_last_purge');
+      const today = now.toDateString();
+      if (lastRun !== today) {
+        // Supprimer TOUS les patients
+        for (const r of data) {
+          await deleteRowDB(r.id);
+        }
+        localStorage.setItem('hfalak_last_purge', today);
+        await loadData();
+        renderORL(); renderAudio();
+        toast(`🗑 Liste patients vidée automatiquement (8h00)`);
+      }
+    }
+
+    // Vérifie toutes les 30 secondes
+    setTimeout(autoDeleteAtEight, 30000);
+  }
+
+  // Démarre la vérification au chargement
+  window.addEventListener('load', () => {
+    setTimeout(autoDeleteAtEight, 5000);
+  });
 </script>
 <script>
   if ('serviceWorker' in navigator) {
